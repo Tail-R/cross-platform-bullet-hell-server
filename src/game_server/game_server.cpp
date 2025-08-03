@@ -248,8 +248,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         120
     };
     enemy.vel = {
-        20,
-        20
+        10,
+        10
     };
     enemy.radius = game_logic_constants::ENEMY_RADIUS;
     frame.enemy_vector.push_back(enemy);
@@ -368,20 +368,20 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         auto& enemy = frame.enemy_vector[0];
         if (enemy.pos.x > game_logic_constants::GAME_WIDTH_HALF)
         {
-            enemy.vel.x = -20;
+            enemy.vel.x = -10;
         }
         else if (enemy.pos.x < -game_logic_constants::GAME_WIDTH_HALF)
         {
-            enemy.vel.x = 20;
+            enemy.vel.x = 10;
         }
         
         if (enemy.pos.y > game_logic_constants::GAME_HEIGHT_HALF)
         {
-            enemy.vel.y = -20;
+            enemy.vel.y = -10;
         }
         else if (enemy.pos.y < 60)
         {
-            enemy.vel.y = 20;
+            enemy.vel.y = 10;
         }
 
         // Move enemy
@@ -407,8 +407,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                 bullet.name = BulletName::BigRed;
                 bullet.pos = frame.enemy_vector[0].pos;
                 bullet.vel = {
-                    12 * std::cos(rad_offset + static_cast<float>(r)),
-                    12 * std::sin(rad_offset + static_cast<float>(r))
+                    4 * std::cos(rad_offset + static_cast<float>(r)),
+                    4 * std::sin(rad_offset + static_cast<float>(r))
                 };
                 bullet.radius = game_logic_constants::ENEMY_BIG_BULLET_RADIUS;
                 bullet.angle = std::atan2(bullet.vel.y, bullet.vel.x) - math_constants::HALF_PI;
