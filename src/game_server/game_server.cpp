@@ -248,8 +248,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         120
     };
     enemy.vel = {
-        10,
-        10
+        4,
+        4
     };
     enemy.radius = game_logic_constants::ENEMY_RADIUS;
     frame.enemy_vector.push_back(enemy);
@@ -368,20 +368,20 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         auto& enemy = frame.enemy_vector[0];
         if (enemy.pos.x > game_logic_constants::GAME_WIDTH_HALF)
         {
-            enemy.vel.x = -10;
+            enemy.vel.x = -4;
         }
         else if (enemy.pos.x < -game_logic_constants::GAME_WIDTH_HALF)
         {
-            enemy.vel.x = 10;
+            enemy.vel.x = 4;
         }
         
         if (enemy.pos.y > game_logic_constants::GAME_HEIGHT_HALF)
         {
-            enemy.vel.y = -10;
+            enemy.vel.y = -4;
         }
         else if (enemy.pos.y < 60)
         {
-            enemy.vel.y = 10;
+            enemy.vel.y = 4;
         }
 
         // Move enemy
@@ -447,7 +447,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Spiral shot
-        if ((frame_count % 360) > 120 && frame_count % 8 == 0)
+        if ((frame_count % 360) > 120 && frame_count % 6 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
             constexpr double step = two_pi / 7;
@@ -459,8 +459,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
             {
                 sprite_index++;
 
-                const float dx = cos(rad_offset + r) * 2;
-                const float dy = sin(rad_offset + r) * 2;
+                const float dx = cos(rad_offset + r) * 2.5;
+                const float dy = sin(rad_offset + r) * 2.5;
 
                 auto bullet = BulletSnapshot{};
 
@@ -475,21 +475,52 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                 frame.bullet_vector.push_back(bullet);
                 frame.bullet_count++;
             }
+        }
 
-            sprite_index = 0;
+        // Reverse spiral shot
+        if ((frame_count % 360) > 120 && frame_count % 6 == 0)
+        {
+            constexpr double two_pi = 2*math_constants::PI;
+            constexpr double step = two_pi / 7;
+
+            const float rad_offset = static_cast<float>(deg_to_rad(355) - deg_to_rad(frame_count % 360));
+            size_t sprite_index = 0;
+
+            for (double r = 0; r < two_pi; r += step)
+            {
+                sprite_index++;
+
+                const float dx = cos(rad_offset + r) * 2.5;
+                const float dy = sin(rad_offset + r) * 2.5;
+
+                auto bullet = BulletSnapshot{};
+
+                bullet.id = bullet_id++;
+                bullet.name = static_cast<BulletName>(
+                    static_cast<size_t>(BulletName::RiceRed) + (sprite_index % 8)
+                );
+                bullet.pos = frame.enemy_vector[0].pos;
+                bullet.vel = { dx, dy };
+                bullet.radius = game_logic_constants::ENEMY_RICE_BULLET_RADIUS;
+                bullet.angle = std::atan2(dy, dx) - math_constants::HALF_PI;
+                frame.bullet_vector.push_back(bullet);
+                frame.bullet_count++;
+            }
         }
 
         // Random shot
-        if (frame_count % 120 == 0 && frame_count > 120)
+        if (frame_count % 60 == 0 && frame_count > 120)
         {
-            constexpr size_t number_of_rand_shot = 8;
+            size_t number_of_rand_shot = 15;
 
             for (size_t i = 0; i < number_of_rand_shot; i++)
             {
-                const double rand_deg = dist(gen);
-                const float rad = static_cast<float>(deg_to_rad(rand_deg));
-                const float dx = cos(rad) * 2;
-                const float dy = sin(rad) * 2;
+                const double rand_1 = dist(gen);
+                const double rand_2 = dist(gen);
+                const float rad_1 = static_cast<float>(deg_to_rad(rand_1));
+                const float rad_2 = static_cast<float>(deg_to_rad(rand_2));
+                const float dx = cos(rad_1) * 3;
+                const float dy = sin(rad_2) * 3;
 
                 auto bullet = BulletSnapshot{};
 
