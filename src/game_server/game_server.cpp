@@ -257,8 +257,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
 
     ArrowState arrow_state = {};
 
-    // msec / FPS
-    constexpr auto target_frame_duration = std::chrono::milliseconds(1000 / 60);
+    // 1sec / Target FPS
+    constexpr auto target_frame_duration = std::chrono::duration<double>(1.0 / 60);
 
     // Wait for client hello
     if (!wait_packet(PayloadType::ClientHello, 1000, 10))
@@ -450,7 +450,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         if ((frame_count % 360) > 120 && frame_count % 6 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
-            constexpr double step = two_pi / 7;
+            constexpr double step = two_pi / 5;
 
             const float rad_offset = static_cast<float>(deg_to_rad(frame_count % 360));
             size_t sprite_index = 0;
@@ -481,9 +481,9 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         if ((frame_count % 360) > 120 && frame_count % 6 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
-            constexpr double step = two_pi / 7;
+            constexpr double step = two_pi / 5;
 
-            const float rad_offset = static_cast<float>(deg_to_rad(355) - deg_to_rad(frame_count % 360));
+            const float rad_offset = static_cast<float>(deg_to_rad(320) - deg_to_rad(frame_count % 360));
             size_t sprite_index = 0;
 
             for (double r = 0; r < two_pi; r += step)
@@ -511,7 +511,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         // Random shot
         if (frame_count % 60 == 0 && frame_count > 120)
         {
-            size_t number_of_rand_shot = 15;
+            size_t number_of_rand_shot = 7;
 
             for (size_t i = 0; i < number_of_rand_shot; i++)
             {
@@ -575,7 +575,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
 
         // Adjust the frame rate
         auto frame_end = std::chrono::steady_clock::now();
-        auto frame_duration = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start);
+        auto frame_duration = frame_end - frame_start;
 
         if (frame_duration < target_frame_duration)
         {
