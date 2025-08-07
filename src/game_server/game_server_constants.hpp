@@ -8,7 +8,7 @@ namespace math_constants {
     constexpr double HALF_PI    = PI / 2;
 }
 
-namespace game_logic_constants {
+namespace game_constants {
     /*
         General configuration
     */
@@ -21,7 +21,7 @@ namespace game_logic_constants {
         Player configuration
     */
     constexpr float PLAYER_RADIUS           = 5.0f;
-    constexpr float PLAYER_SPEED            = 4.0f;
+    constexpr float PLAYER_SPEED            = 2.5f;
     constexpr float PLAYER_BULLET_RADIUS    = 5.0f;
     constexpr float PLAYER_BULLET_SPEED     = 10.0f;
 

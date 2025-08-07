@@ -3,7 +3,7 @@
 #include <algorithm>    // std::clamp
 #include <random>
 #include "game_server.hpp"
-#include "game_logic_constants.hpp"
+#include "game_server_constants.hpp"
 #include <packet_stream/packet_stream.hpp>
 #include <packet_template/packet_template.hpp>
 
@@ -167,10 +167,10 @@ void apply_player_input(
 }
 
 bool outside(int x, int y) {
-    const auto expr_1 = x >  game_logic_constants::GAME_WIDTH_HALF;
-    const auto expr_2 = x < -game_logic_constants::GAME_WIDTH_HALF;
-    const auto expr_3 = y >  game_logic_constants::GAME_HEIGHT_HALF;
-    const auto expr_4 = y < -game_logic_constants::GAME_HEIGHT_HALF;
+    const auto expr_1 = x >  game_constants::GAME_WIDTH_HALF;
+    const auto expr_2 = x < -game_constants::GAME_WIDTH_HALF;
+    const auto expr_3 = y >  game_constants::GAME_HEIGHT_HALF;
+    const auto expr_4 = y < -game_constants::GAME_HEIGHT_HALF;
 
     return expr_1 || expr_2 || expr_3 || expr_4;
 }
@@ -231,10 +231,10 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         -120
     };
     player.vel = {
-        game_logic_constants::PLAYER_SPEED,
-        game_logic_constants::PLAYER_SPEED
+        game_constants::PLAYER_SPEED,
+        game_constants::PLAYER_SPEED
     };
-    player.radius = game_logic_constants::PLAYER_RADIUS;
+    player.radius = game_constants::PLAYER_RADIUS;
     player.lives = 1;
     frame.player_vector.push_back(player);
     frame.player_count = 1; 
@@ -251,7 +251,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         2,
         2
     };
-    enemy.radius = game_logic_constants::ENEMY_RADIUS;
+    enemy.radius = game_constants::ENEMY_RADIUS;
     frame.enemy_vector.push_back(enemy);
     frame.enemy_count = 1;
 
@@ -366,16 +366,16 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         
         // Update enemy direction
         auto& enemy = frame.enemy_vector[0];
-        if (enemy.pos.x > game_logic_constants::GAME_WIDTH_HALF)
+        if (enemy.pos.x > game_constants::GAME_WIDTH_HALF)
         {
             enemy.vel.x = -2;
         }
-        else if (enemy.pos.x < -game_logic_constants::GAME_WIDTH_HALF)
+        else if (enemy.pos.x < -game_constants::GAME_WIDTH_HALF)
         {
             enemy.vel.x = 2;
         }
         
-        if (enemy.pos.y > game_logic_constants::GAME_HEIGHT_HALF)
+        if (enemy.pos.y > game_constants::GAME_HEIGHT_HALF)
         {
             enemy.vel.y = -2;
         }
@@ -410,7 +410,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                     2 * std::cos(rad_offset + static_cast<float>(r)),
                     2 * std::sin(rad_offset + static_cast<float>(r))
                 };
-                bullet.radius = game_logic_constants::ENEMY_BIG_BULLET_RADIUS;
+                bullet.radius = game_constants::ENEMY_BIG_BULLET_RADIUS;
                 bullet.angle = std::atan2(bullet.vel.y, bullet.vel.x) - math_constants::HALF_PI;
                 frame.bullet_vector.push_back(bullet);
                 frame.bullet_count++;
@@ -440,7 +440,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
             bullet.name = BulletName::WedgeRed;
             bullet.pos = frame.enemy_vector[0].pos;
             bullet.vel = { dx, dy };
-            bullet.radius = game_logic_constants::ENEMY_WEDGE_BULLET_RADIUS;
+            bullet.radius = game_constants::ENEMY_WEDGE_BULLET_RADIUS;
             bullet.angle = std::atan2(dy, dx) - math_constants::HALF_PI;
             frame.bullet_vector.push_back(bullet);
             frame.bullet_count++;
@@ -450,7 +450,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         if ((frame_count % 360) > 120 && frame_count % 6 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
-            constexpr double step = two_pi / 5;
+            constexpr double step = two_pi / 7;
 
             const float rad_offset = static_cast<float>(deg_to_rad(frame_count % 360));
             size_t sprite_index = 0;
@@ -459,8 +459,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
             {
                 sprite_index++;
 
-                const float dx = cos(rad_offset + r) * 2;
-                const float dy = sin(rad_offset + r) * 2;
+                const float dx = cos(rad_offset + r) * 1.5;
+                const float dy = sin(rad_offset + r) * 1.5;
 
                 auto bullet = BulletSnapshot{};
 
@@ -470,38 +470,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                 );
                 bullet.pos = frame.enemy_vector[0].pos;
                 bullet.vel = { dx, dy };
-                bullet.radius = game_logic_constants::ENEMY_RICE_BULLET_RADIUS;
-                bullet.angle = std::atan2(dy, dx) - math_constants::HALF_PI;
-                frame.bullet_vector.push_back(bullet);
-                frame.bullet_count++;
-            }
-        }
-
-        // Reverse spiral shot
-        if ((frame_count % 360) > 120 && frame_count % 6 == 0)
-        {
-            constexpr double two_pi = 2*math_constants::PI;
-            constexpr double step = two_pi / 5;
-
-            const float rad_offset = static_cast<float>(deg_to_rad(320) - deg_to_rad(frame_count % 360));
-            size_t sprite_index = 0;
-
-            for (double r = 0; r < two_pi; r += step)
-            {
-                sprite_index++;
-
-                const float dx = cos(rad_offset + r) * 2;
-                const float dy = sin(rad_offset + r) * 2;
-
-                auto bullet = BulletSnapshot{};
-
-                bullet.id = bullet_id++;
-                bullet.name = static_cast<BulletName>(
-                    static_cast<size_t>(BulletName::RiceRed) + (sprite_index % 8)
-                );
-                bullet.pos = frame.enemy_vector[0].pos;
-                bullet.vel = { dx, dy };
-                bullet.radius = game_logic_constants::ENEMY_RICE_BULLET_RADIUS;
+                bullet.radius = game_constants::ENEMY_RICE_BULLET_RADIUS;
                 bullet.angle = std::atan2(dy, dx) - math_constants::HALF_PI;
                 frame.bullet_vector.push_back(bullet);
                 frame.bullet_count++;
@@ -519,8 +488,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                 const double rand_2 = dist(gen);
                 const float rad_1 = static_cast<float>(deg_to_rad(rand_1));
                 const float rad_2 = static_cast<float>(deg_to_rad(rand_2));
-                const float dx = cos(rad_1) * 3;
-                const float dy = sin(rad_2) * 3;
+                const float dx = cos(rad_1) * 2;
+                const float dy = sin(rad_2) * 2;
 
                 auto bullet = BulletSnapshot{};
 
@@ -528,7 +497,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
                 bullet.name = static_cast<BulletName>(i % 8 + 1);
                 bullet.pos = frame.enemy_vector[0].pos;
                 bullet.vel = { dx, dy };
-                bullet.radius = game_logic_constants::ENEMY_NORMAL_BULLET_RADIUS;
+                bullet.radius = game_constants::ENEMY_NORMAL_BULLET_RADIUS;
                 bullet.angle = std::atan2(dy, dx) - math_constants::HALF_PI;
                 frame.bullet_vector.push_back(bullet);
                 frame.bullet_count++;
