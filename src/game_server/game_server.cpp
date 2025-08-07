@@ -418,7 +418,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Homing shot
-        if ((frame_count % 360) > 240 && frame_count % 8 == 0)
+        if ((frame_count % 360) > 240 && frame_count % 30 == 0)
         {
             float vx = frame.player_vector[0].pos.x - frame.enemy_vector[0].pos.x;
             float vy = frame.player_vector[0].pos.y - frame.enemy_vector[0].pos.y;
@@ -430,8 +430,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
 
             if (length != 0.0f)
             {
-                dx = vx / length * 4.0f;
-                dy = vy / length * 4.0f;
+                dx = vx / length * 2.0f;
+                dy = vy / length * 2.0f;
             }
 
             auto bullet = BulletSnapshot{};
