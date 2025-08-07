@@ -3,7 +3,7 @@
 #include <algorithm>    // std::clamp
 #include <random>
 #include "game_server.hpp"
-#include <game_logic_constants.hpp>
+#include "game_logic_constants.hpp"
 #include <packet_stream/packet_stream.hpp>
 #include <packet_template/packet_template.hpp>
 
