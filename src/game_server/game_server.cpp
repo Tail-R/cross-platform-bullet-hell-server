@@ -418,7 +418,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Homing shot
-        if ((frame_count % 360) > 240 && frame_count % 30 == 0)
+        if ((frame_count % 360) > 120 && frame_count % 30 == 0)
         {
             float vx = frame.player_vector[0].pos.x - frame.enemy_vector[0].pos.x;
             float vy = frame.player_vector[0].pos.y - frame.enemy_vector[0].pos.y;
@@ -430,8 +430,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
 
             if (length != 0.0f)
             {
-                dx = vx / length * 2.0f;
-                dy = vy / length * 2.0f;
+                dx = vx / length * 2.5f;
+                dy = vy / length * 2.5f;
             }
 
             auto bullet = BulletSnapshot{};
@@ -447,7 +447,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Spiral shot
-        if ((frame_count % 360) > 120 && frame_count % 6 == 0)
+        if ((frame_count % 360) > 120 && frame_count % 8 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
             constexpr double step = two_pi / 7;
@@ -459,8 +459,8 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
             {
                 sprite_index++;
 
-                const float dx = cos(rad_offset + r) * 1.5;
-                const float dy = sin(rad_offset + r) * 1.5;
+                const float dx = cos(rad_offset + r) * 2;
+                const float dy = sin(rad_offset + r) * 2;
 
                 auto bullet = BulletSnapshot{};
 
