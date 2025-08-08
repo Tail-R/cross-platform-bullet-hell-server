@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+    bullet_hell_server:
+        image: bullet_hell_server
+        ports:
+            - "22222:22222"
