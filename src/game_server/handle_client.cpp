@@ -102,7 +102,6 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
     std::cout << "[GameServerMaster] DEBUG: Server game response has been sent" << "\n";
 
     auto quit = false;
-    auto frame_count = 0;
     auto bullet_id = 0;
 
     std::random_device rd;
@@ -117,7 +116,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
     // Game logic loop
     while (m_running && !quit)
     {
-        frame_count++;
+        frame.timestamp++;
 
         auto frame_start = std::chrono::steady_clock::now();
 
@@ -205,19 +204,19 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Move enemy
-        if ((frame_count % 360) < 120)
+        if ((frame.timestamp % 360) < 120)
         {
             frame.enemy_vector[0].pos.x += frame.enemy_vector[0].vel.x;
             frame.enemy_vector[0].pos.y += frame.enemy_vector[0].vel.y;
         }
 
         // Circle shot
-        if ((frame_count % 360) > 120 && frame_count % 60 == 0)
+        if ((frame.timestamp % 360) > 120 && frame.timestamp % 60 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
             constexpr double step = two_pi / 8;
 
-            const float rad_offset = static_cast<float>(deg_to_rad(frame_count % 360));
+            const float rad_offset = static_cast<float>(deg_to_rad(frame.timestamp % 360));
 
             for (double r = 0; r < two_pi; r += step)
             {
@@ -238,7 +237,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Homing shot
-        if ((frame_count % 360) > 120 && frame_count % 30 == 0)
+        if ((frame.timestamp % 360) > 120 && frame.timestamp % 30 == 0)
         {
             float vx = frame.player_vector[0].pos.x - frame.enemy_vector[0].pos.x;
             float vy = frame.player_vector[0].pos.y - frame.enemy_vector[0].pos.y;
@@ -267,12 +266,12 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Spiral shot
-        if ((frame_count % 360) > 120 && frame_count % 8 == 0)
+        if ((frame.timestamp % 360) > 120 && frame.timestamp % 8 == 0)
         {
             constexpr double two_pi = 2*math_constants::PI;
             constexpr double step = two_pi / 7;
 
-            const float rad_offset = static_cast<float>(deg_to_rad(frame_count % 360));
+            const float rad_offset = static_cast<float>(deg_to_rad(frame.timestamp % 360));
             size_t sprite_index = 0;
 
             for (double r = 0; r < two_pi; r += step)
@@ -298,7 +297,7 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         }
 
         // Random shot
-        if (frame_count % 60 == 0 && frame_count > 120)
+        if (frame.timestamp % 60 == 0 && frame.timestamp > 120)
         {
             size_t number_of_rand_shot = 7;
 
