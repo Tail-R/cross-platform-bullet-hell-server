@@ -10,8 +10,6 @@
 #include <packet_template/packet_template.hpp>
 
 void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_conn) {
-    GameLogger game_logger;
-
     PacketStreamServer packet_stream(client_conn);
     packet_stream.start();
 
@@ -112,6 +110,9 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
 
     // Create a distribution in the range [0, 359]
     std::uniform_int_distribution<> dist(0, 359);
+
+    // Start logger
+    GameLogger game_logger;
 
     // Game logic loop
     while (m_running && !quit)
