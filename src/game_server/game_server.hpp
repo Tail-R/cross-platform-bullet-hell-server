@@ -27,4 +27,4 @@ private:
     std::thread                     m_accept_thread;
     size_t                          m_max_instances;
     std::atomic<size_t>             m_active_instances;
-}; 
+};

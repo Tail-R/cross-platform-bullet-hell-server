@@ -28,6 +28,7 @@ set(SRC_FILES
     ${SRC_DIR}/game_server/game_server.cpp
     ${SRC_DIR}/game_server/game_server_utils.cpp
     ${SRC_DIR}/game_server/handle_client.cpp
+    ${SRC_DIR}/game_logger/game_logger.cpp
 )
 
 # Include scripts
@@ -51,16 +52,6 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     sol2::sol2
     shared_lib
 )
-
-# Link OS-specific libraries
-# Winsock2
-if(WIN32)
-    if (MINGW)
-        target_link_libraries(${TARGET_NAME} PRIVATE mingw32)
-    endif()
-
-    target_link_libraries(${TARGET_NAME} PRIVATE ws2_32)
-endif()
 
 target_compile_definitions(${TARGET_NAME} PRIVATE
     PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}"
