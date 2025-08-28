@@ -26,6 +26,8 @@ set(SRC_FILES
     ${SRC_DIR}/main.cpp
 
     ${SRC_DIR}/game_server/game_server.cpp
+    ${SRC_DIR}/game_server/game_server_utils.cpp
+    ${SRC_DIR}/game_server/handle_client.cpp
 )
 
 # Include scripts
