@@ -5,10 +5,13 @@
 #include "game_server.hpp"
 #include "game_server_constants.hpp"
 #include "game_server_utils.hpp"
+#include "../game_logger/game_logger.hpp"
 #include <packet_stream/packet_stream.hpp>
 #include <packet_template/packet_template.hpp>
 
 void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_conn) {
+    GameLogger game_logger;
+
     PacketStreamServer packet_stream(client_conn);
     packet_stream.start();
 
@@ -357,6 +360,10 @@ void GameServerMaster::handle_client(std::shared_ptr<ClientConnection> client_co
         // Send frame
         const auto packet = make_packet<FrameSnapshot>(frame);
         packet_stream.send_packet(packet);
+
+        // Save game log
+        const auto log_message = frame_to_json_str(frame);
+        game_logger.async_log(log_message);
 
         // Adjust the frame rate
         auto frame_end = std::chrono::steady_clock::now();
