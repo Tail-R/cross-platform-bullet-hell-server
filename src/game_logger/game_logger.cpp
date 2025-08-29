@@ -47,9 +47,8 @@ namespace {
 
         std::ostringstream oss;
 
-        oss << std::put_time(&buff, "[%Y-%m-%d]_[%H-%M-%S.");
-        oss << '_' << std::setw(3) << std::setfill('0') << ms.count();
-        oss << "]";
+        oss << std::put_time(&buff, "%Y%m%d_%H-%M-%S");
+        oss << '-' << std::setw(3) << std::setfill('0') << ms.count();
 
         return oss.str();
     }
