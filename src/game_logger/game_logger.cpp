@@ -47,13 +47,14 @@ namespace {
 
         std::ostringstream oss;
 
-        oss << std::put_time(&buff, "%Y%m%d%H%M%S");
+        oss << std::put_time(&buff, "[%Y-%m-%d]_[%H-%M-%S.");
         oss << '_' << std::setw(3) << std::setfill('0') << ms.count();
+        oss << "]";
 
         return oss.str();
     }
 
-} // unnamed namespace
+}
 
 GameLogger::GameLogger(const std::string& base_cache_dir, const std::string& base_data_dir)
     : m_base_cache_dir(base_cache_dir)
@@ -69,10 +70,16 @@ GameLogger::GameLogger(const std::string& base_cache_dir, const std::string& bas
     // Create directories
     std::error_code ec;
     fs::create_directories(m_cache_dir, ec);
-    if (ec) std::cerr << "[GameLogger] ERROR: cache_dir creation failed: " << ec.message() << "\n";
+    if (ec)
+    {
+        std::cerr << "[GameLogger] ERROR: cache_dir creation failed: " << ec.message() << "\n";
+    }
 
     fs::create_directories(m_data_dir, ec);
-    if (ec) std::cerr << "[GameLogger] ERROR: data_dir creation failed: " << ec.message() << "\n";
+    if (ec)
+    {
+        std::cerr << "[GameLogger] ERROR: data_dir creation failed: " << ec.message() << "\n";
+    }
 
     // File name
     m_filename = m_timestamp + "_" + m_hostname + "_" + m_thread_id + "_playlog.json";
@@ -93,6 +100,7 @@ GameLogger::~GameLogger() noexcept {
         m_worker.join();
     }
 
+    // Close ofstream
     m_cache_file.flush();
     m_cache_file.close();
     m_data_file.flush();
@@ -105,6 +113,18 @@ GameLogger::~GameLogger() noexcept {
     if (src && dst)
     {
         dst << src.rdbuf();
+    }
+
+    // Remove cache
+    auto cache_file = fs::path(m_cache_dir / m_filename);
+
+    try
+    {
+        fs::remove(cache_file);
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "[GameLogger] ERROR: Failed to remove cache file" << "\n";
     }
 }
 
