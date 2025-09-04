@@ -1,14 +1,14 @@
 ##### Build Stage ####################################################
-FROM alpine:latest AS builder
+FROM debian:bookworm AS builder
 
-# Install dependencies
-RUN apk add --no-cache \
-    build-base \
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     cmake \
     git \
-    luajit-dev \
-    musl-dev \
-    libc-dev
+    libluajit-5.1-dev \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -20,7 +20,13 @@ RUN mkdir -p build && cd build \
     && cmake --build .
 
 ##### Final Stage ####################################################
-FROM scratch
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libluajit-5.1-2 \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
