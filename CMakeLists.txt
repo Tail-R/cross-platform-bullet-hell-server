@@ -43,13 +43,13 @@ add_executable(${TARGET_NAME}
 )
 
 # Include directories
-target_include_directories(${TARGET_NAME} PRIVATE src)
+target_include_directories(${TARGET_NAME} PRIVATE ${SRC_DIR})
 
 # Link libraries
 target_link_libraries(${TARGET_NAME} PRIVATE
+    bullet_hell_shared
     luajit
     sol2::sol2
-    shared_lib
 )
 
 # Define project root for compilation
@@ -62,25 +62,27 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
 add_library(bullet_hell_lib STATIC ${SRC_FILES})
 
 # Include directories for library
-target_include_directories(bullet_hell_lib PUBLIC src)
+target_include_directories(bullet_hell_lib PUBLIC ${SRC_DIR})
 
 # Link dependencies for library
-target_link_libraries(bullet_hell_lib PRIVATE
+target_link_libraries(bullet_hell_lib PUBLIC
+    bullet_hell_shared
     luajit
     sol2::sol2
-    shared_lib
 )
 
 ##### Google Test configuration ######################################
+set(TEST_NAME bullet_hell_server.test)
+
 # Collect all test sources
 file(GLOB TEST_SOURCES test/*.cpp)
 
 # Create test executable
-add_executable(all_tests ${TEST_SOURCES})
+add_executable(${TEST_NAME} ${TEST_SOURCES})
 
 # Link test executable with library and gtest
-target_link_libraries(all_tests PRIVATE bullet_hell_lib gtest_main)
+target_link_libraries(${TEST_NAME} PRIVATE bullet_hell_lib gtest_main)
 
 # Enable automatic test discovery
 include(GoogleTest)
-gtest_discover_tests(all_tests)
+gtest_discover_tests(${TEST_NAME})
