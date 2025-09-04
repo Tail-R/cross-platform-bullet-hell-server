@@ -17,6 +17,14 @@ RUN mkdir -p build && cd build \
     && cmake .. \
     && cmake --build .
 
+##### Test Stage #####################################################
+FROM builder AS test
+
+WORKDIR /app/build
+
+# Run unit tests using CTest
+CMD ["ctest", "--output-on-failure"]
+
 ##### Final Stage ####################################################
 FROM archlinux:latest
 
