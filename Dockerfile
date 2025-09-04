@@ -1,17 +1,15 @@
 ##### Build Stage ####################################################
-FROM debian:bookworm AS builder
+FROM archlinux:latest AS builder
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+# Build dependencies
+RUN pacman -Syu --noconfirm \
+    base-devel \
     cmake \
     git \
-    libluajit-5.1-dev \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+    luajit \
+    && pacman -Scc --noconfirm
 
 WORKDIR /app
-
 COPY . .
 
 # Build
@@ -20,16 +18,16 @@ RUN mkdir -p build && cd build \
     && cmake --build .
 
 ##### Final Stage ####################################################
-FROM debian:bookworm-slim
+FROM archlinux:latest
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libluajit-5.1-2 \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+# Runtime dependencies only
+RUN pacman -Syu --noconfirm \
+    luajit \
+    && pacman -Scc --noconfirm
 
 WORKDIR /app
 
+# Copy built binary from builder
 COPY --from=builder /app/build/bullet_hell_server ./bullet_hell_server
 
 CMD ["./bullet_hell_server"]
